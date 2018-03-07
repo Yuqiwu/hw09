@@ -1,130 +1,49 @@
-var box = document.getElementById("box");
-var startit = document.getElementById("start");
-var stopit = document.getElementById("stop");
-var toggleit = document.getElementById("toggle");
+var c = document.getElementById("clear")
+var box = document.getElementById("box")
 
-// switch between mode
-// 1 for grow and shrink
-// 2 for dvd movement
-var tog = 1;
-
-// timer ID
-var ID = 0;
-
-// animation status
-var start = true;
-
-// grow and shrink properties
-var stat = true;
-var r = 0;
-
-// dvd movement properties
-var x = 100;
-var y = 200;
-var vx = 6;
-var vy = 9;
-
-var stop = function(){
-    start = false;
-    clearInterval(ID);
-}
-
-var toggle = function(){
-    stop();
-    if (tog == 1){
-	tog = 2;
-	dvd();
-    }
-    else{
-	tog = 1;
-	grow();
-    }
-}
-
-var clear = function(){
+var clear = function(e){
     box.innerHTML = null;
 }
 
-var grow = function(){
-    clear();
+var second = function(e){
+    if (this.getAttribute("fill") == "red"){
+	this.setAttribute("fill", "blue");
+	e.stopPropagation();
+    }
+    else{
+	box.removeChild(this);
+	e.stopPropagation();
+	var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+	x = Math.floor( Math.random() * 500 );
+	y = Math.floor( Math.random() * 500 );
+	circle.setAttribute("cx", x.toString() );
+	circle.setAttribute("cy", y.toString() );
+	circle.setAttribute("r", "10" );
+	circle.setAttribute("fill", "red" );
+	box.appendChild(circle);
+	circle.addEventListener("click", second, true);
+    }
+}
+
+var draw = function(e){
+    x = e.offsetX;
+    y = e.offsetY;
     
     var circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", "250");
-    circle.setAttribute("cy", "250");
-    circle.setAttribute("r", r.toString() );
+    circle.setAttribute("cx", x.toString() );
+    circle.setAttribute("cy", y.toString() );
+    circle.setAttribute("r", "10");
+    circle.setAttribute("fill", "red");
     box.appendChild(circle);
-    
-    var animate = function(){
-	circle.setAttribute("r", r.toString() );
-	circle.setAttribute("fill", "red");
-	status();
-	console.log("drawing circle");
-    }
-    
-    var status = function(){
-	if (stat == true){
-	    r++;
-	    if (r > 249){
-		stat = false;
-	    }
-	}
-	else{
-	    r--;
-	    if (r < 1){
-		stat = true;
-	    }
-	}
-    }
-    
-    ID = setInterval(animate, 10);
+    circle.addEventListener("click", second, true);
 }
 
-var dvd = function(){
-    clear();
+var rec = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+rec.setAttribute("x", "250" );
+rec.setAttribute("y", "250" );
+rec.setAttribute("width", "250" );
+rec.setAttribute("height", "250" );
+rec.setAttribute("stroke", "black" );
 
-    var rect = document.createElementNS("http://www.w3.org/2000/svg", "rect");
-    rect.setAttribute("fill", "red");
-    rect.setAttribute("width", "30" );
-    rect.setAttribute("height", "20" );
-    rect.setAttribute("x", x.toString() );
-    rect.setAttribute("y", y.toString() );
-    box.appendChild(rect);
-    
-    var animate = function(){
-	rect.setAttribute("x", x.toString() );
-	rect.setAttribute("y", y.toString() );
-	movement();
-    }
-
-    var movement = function(){
-	if (x <= 15 || x >= 485){
-	    vx = -vx;
-	}
-	if (y <= 10 || y >= 490){
-	    vy = -vy;
-	}
-	x = x + vx;
-	y = y + vy;
-    }
-    ID = setInterval(animate,10);
-}
-
-var start = function(){
-    if (start == false){
-	if (tog == 1){
-	    grow();
-	}
-	else{
-	    dvd();
-	}
-	start = true;
-    }
-}
-
-
-grow();
-
-
-startit.addEventListener("click", start);
-stopit.addEventListener("click", stop);
-toggleit.addEventListener("click", toggle);
+c.addEventListener("click", clear);
+box.addEventListener("click", draw);
